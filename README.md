@@ -1,12 +1,12 @@
 ## Cuckoo Search Enhancement Thesis
 
-## Set up
+### Set up
 
 1. Create a virtual environment `python -m venv venv`
 2. Activate the virtual environment `source venv/Scripts/activate`
 3. Install dependencies `pip install -r requirements.txt`
 
-## Project Structure Introduction
+### Project Structure Introduction
 
 ```
 functions/
@@ -32,7 +32,7 @@ requirements.txt
 
 ```
 
-## Algorithm Testing
+### Algorithm Testing
 
 To test the Cuckoo Search and Enhanced Cuckoo Search algorithms, simply run the following python commands:
 
