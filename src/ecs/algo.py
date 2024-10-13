@@ -80,7 +80,10 @@ def enhanced_cuckoo_search(birds = 3, discovery_rate = 0.25, alpha_value = 0.01,
     count    = 0
 
     d_max, d_min = discovery_rate
-    cos_annealing = CosineAnnealingWithWarmRestarts(n_max=d_max, n_min=d_min, t_max=10)
+    d_cos_annealing = CosineAnnealingWithWarmRestarts(n_max=d_max, n_min=d_min, t_max=10)
+
+    a_max, a_min = alpha_value
+    a_cos_annealing = CosineAnnealingWithWarmRestarts(n_max=a_max, n_min=a_min, t_max=10)
 
     hasReachedTarget = False
     _iter = 0
@@ -89,11 +92,14 @@ def enhanced_cuckoo_search(birds = 3, discovery_rate = 0.25, alpha_value = 0.01,
         if (verbose == True):
             print('Iteration = ', count, ' f(x) = ', best_ind[-1])    
 
+        # adaptive step size
+        a_val = a_cos_annealing.step()
+
         for i in range(0, position.shape[0]):
-            position = replace_bird(position, alpha_value, lambda_value, min_values, max_values, target_function)
+            position = replace_bird(position=position, alpha_value=a_val, lambda_value=lambda_value, min_values=min_values, max_values=max_values, target_function=target_function)
 
         # adaptive discovery rate
-        d_rate = cos_annealing.step()
+        d_rate = d_cos_annealing.step()
 
         position = update_positions(position=position, min_values=min_values, max_values=max_values, target_function=target_function, discovery_rate=d_rate)
         value    = np.copy(position[position[:,-1].argsort()][0,:])
