@@ -76,6 +76,7 @@ def cuckoo_search(birds = 3, discovery_rate = 0.25, alpha_value = 0.01, lambda_v
     position = initial_variables(birds, min_values, max_values, target_function, start_init)    
     best_ind = np.copy(position[position[:,-1].argsort()][0,:])
     count    = 0
+    hasReachedTarget = False
     while (count <= iterations):
         if (verbose == True):
             print('Iteration = ', count, ' f(x) = ', best_ind[-1])    
@@ -88,10 +89,11 @@ def cuckoo_search(birds = 3, discovery_rate = 0.25, alpha_value = 0.01, lambda_v
         if (target_value is not None):
             if (best_ind[-1] <= target_value):
                 count = 2* iterations
+                hasReachedTarget = True
             else:
                 count = count + 1
         else:
             count = count + 1   
-    return best_ind
+    return best_ind, hasReachedTarget
 
 ############################################################################
