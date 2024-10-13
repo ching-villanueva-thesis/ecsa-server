@@ -1,0 +1,1 @@
+'This module contains the basic Cuckoo Search Algorithm.'
