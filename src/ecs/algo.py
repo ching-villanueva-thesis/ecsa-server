@@ -73,15 +73,17 @@ def update_positions(position, discovery_rate, min_values, max_values, target_fu
 ############################################################################
 
 # Function: CS
-def enhanced_cuckoo_search(birds = 3, discovery_rate = 0.25, alpha_value = 0.01, lambda_value = 1.5, min_values = [-5,-5], max_values = [5,5], iterations = 50, target_function = target_function, verbose = True, start_init = None, target_value = None): 
-    position = initial_variables(birds, min_values, max_values, target_function, start_init)    
+def enhanced_cuckoo_search(birds = 3, discovery_rate = 0.25, alpha_value = 0.01, lambda_value = 1.5, min_values = [-5,-5], max_values = [5,5], iterations = 50, target_function = target_function, verbose = True, start_init = None, target_value = None, simulator = False, init_population = None): 
+    position = initial_variables(birds, min_values, max_values, target_function, start_init) if not simulator else init_population
+    
     best_ind = np.copy(position[position[:,-1].argsort()][0,:])
     count    = 0
 
     d_max, d_min = discovery_rate
-    cos_annealing = CosineAnnealingWithWarmRestarts(n_max=d_max, n_min=d_min, t_max=20)
+    cos_annealing = CosineAnnealingWithWarmRestarts(n_max=d_max, n_min=d_min, t_max=10)
 
     hasReachedTarget = False
+    _iter = 0
 
     while (count <= iterations):
         if (verbose == True):
@@ -104,8 +106,9 @@ def enhanced_cuckoo_search(birds = 3, discovery_rate = 0.25, alpha_value = 0.01,
                 hasReachedTarget = True
             else:
                 count = count + 1
+                _iter = count
         else:
-            count = count + 1   
-    return best_ind, hasReachedTarget
+            count = count + 1
+    return best_ind, hasReachedTarget, _iter
 
 ############################################################################
