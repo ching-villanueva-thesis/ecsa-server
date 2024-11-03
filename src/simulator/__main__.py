@@ -31,11 +31,11 @@ if __name__ == '__main__':
     for i in range(runs):
         print(f"====== Trial {i + 1} ======")
 
-        init_population = initial_variables(size=CS_PARAMS['birds'], min_values=CS_PARAMS['min_values'], max_values=CS_PARAMS['max_values'], target_function=ackley, start_init=None)
+        # init_population = initial_variables(size=CS_PARAMS['birds'], min_values=CS_PARAMS['min_values'], max_values=CS_PARAMS['max_values'], target_function=ackley, start_init=None)
 
-        cs_best, cs_hasReachedTarget, cs_iter = cuckoo_search(target_function=ackley, init_population=init_population, discovery_rate=0.25, alpha_value=0.01, **CS_PARAMS)
+        cs_best, cs_hasReachedTarget, cs_iter = cuckoo_search(target_function=ackley, discovery_rate=0.25, alpha_value=0.01, **CS_PARAMS)
 
-        ecs_best, ecs_hasReachedTarget, ecs_iter = enhanced_cuckoo_search(target_function=ackley, init_population=init_population, discovery_rate=[0.5, 0.25], alpha_value=[0.01, 0.05], **CS_PARAMS)
+        ecs_best, ecs_hasReachedTarget, ecs_iter = enhanced_cuckoo_search(target_function=ackley, discovery_rate=[0.5, 0.25], alpha_value=[0.01, 0.05], **CS_PARAMS)
 
         cs_fitness.append(cs_best[-1])
         ecs_fitness.append(ecs_best[-1])
