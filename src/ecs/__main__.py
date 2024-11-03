@@ -11,7 +11,7 @@ if __name__ == '__main__':
     'birds': 15,
     'iterations': 100,
     'discovery_rate': [0.75, 0.25],
-    'alpha_value': 0.01,
+    'alpha_value': [0.01, 0.05],
     'lambda_value': 1.5,
     'target_value': 0,
     'min_values': (-32,-32),
