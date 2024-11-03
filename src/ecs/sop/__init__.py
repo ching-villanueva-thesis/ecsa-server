@@ -1,3 +1,6 @@
 from .sop1 import SobolInitialization
+from .sop3 import CosineAnnealingWithWarmRestarts
 
 SobolInitialization
+
+CosineAnnealingWithWarmRestarts

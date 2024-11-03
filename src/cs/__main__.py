@@ -43,4 +43,4 @@ if __name__ == '__main__':
     print(f"Minimum Value: {_min}")
     print(f"Maximum Value: {_max}")
     print(f"Average: {avg}")
-    # print(f"Standard Deviation: {standard_deviation}")
+    print(f"Standard Deviation: {standard_deviation}")

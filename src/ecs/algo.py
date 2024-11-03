@@ -1,4 +1,5 @@
 import numpy  as np
+from src.ecs.sop import CosineAnnealingWithWarmRestarts
 from src.ecs.sop import SobolInitialization
 
 ############################################################################
@@ -43,9 +44,12 @@ def levy_flight(mean):
 def replace_bird(position, alpha_value, lambda_value, min_values, max_values, target_function):
     random_bird  = np.random.randint(position.shape[0])
     levy_values  = levy_flight(lambda_value)
+    random_bird  = np.random.randint(position.shape[0])
+    levy_values  = levy_flight(lambda_value)
     new_solution = np.copy(position[random_bird, :-1])
     rand_factors = np.random.rand(len(min_values))
     new_solution = np.clip(new_solution + alpha_value * levy_values * new_solution * rand_factors, min_values, max_values)
+    new_fitness  = target_function(new_solution)
     new_fitness  = target_function(new_solution)
     if (new_fitness < position[random_bird, -1]):
         position[random_bird,:-1] = new_solution
@@ -92,15 +96,32 @@ def enhanced_cuckoo_search(birds = 3, discovery_rate = 0.25, alpha_value = 0.01,
         position = init_population
     best_ind = np.copy(position[position[:,-1].argsort()][0,:])
     count    = 0
+
+    d_max, d_min = discovery_rate
+    d_cos_annealing = CosineAnnealingWithWarmRestarts(n_max=d_max, n_min=d_min, t_max=20)
+
+    a_max, a_min = alpha_value
+    a_cos_annealing = CosineAnnealingWithWarmRestarts(n_max=a_max, n_min=a_min, t_max=20)
+
     hasReachedTarget = False
     _iter = 0
+
     while (count <= iterations):
         if (verbose == True):
             print('Iteration = ', count, ' f(x) = ', best_ind[-1])    
+
+        # adaptive step size
+        a_val = a_cos_annealing.step()
+
         for i in range(0, position.shape[0]):
-            position = replace_bird(position, alpha_value, lambda_value, min_values, max_values, target_function)
-        position = update_positions(position, discovery_rate, min_values, max_values, target_function)
-        value    = np.copy(position[position[:,-1].argsort()][0,:]) 
+            position = replace_bird(position=position, alpha_value=a_val, lambda_value=lambda_value, min_values=min_values, max_values=max_values, target_function=target_function)
+
+        # adaptive discovery rate
+        d_rate = d_cos_annealing.step()
+
+        position = update_positions(position=position, min_values=min_values, max_values=max_values, target_function=target_function, discovery_rate=d_rate)
+        value    = np.copy(position[position[:,-1].argsort()][0,:])
+
         if (best_ind[-1] > value[-1]):
             best_ind = np.copy(position[position[:,-1].argsort()][0,:])     
         if (target_value is not None):
@@ -111,7 +132,7 @@ def enhanced_cuckoo_search(birds = 3, discovery_rate = 0.25, alpha_value = 0.01,
                 count = count + 1
                 _iter = count
         else:
-            count = count + 1   
+            count = count + 1
     return best_ind, hasReachedTarget, _iter
 
 ############################################################################
