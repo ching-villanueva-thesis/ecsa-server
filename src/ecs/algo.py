@@ -1,5 +1,6 @@
 import numpy  as np
 from src.ecs.sop import CosineAnnealingWithWarmRestarts
+from src.ecs.sop import SobolInitialization
 
 ############################################################################
 
@@ -43,9 +44,12 @@ def levy_flight(mean):
 def replace_bird(position, alpha_value, lambda_value, min_values, max_values, target_function):
     random_bird  = np.random.randint(position.shape[0])
     levy_values  = levy_flight(lambda_value)
+    random_bird  = np.random.randint(position.shape[0])
+    levy_values  = levy_flight(lambda_value)
     new_solution = np.copy(position[random_bird, :-1])
     rand_factors = np.random.rand(len(min_values))
     new_solution = np.clip(new_solution + alpha_value * levy_values * new_solution * rand_factors, min_values, max_values)
+    new_fitness  = target_function(new_solution)
     new_fitness  = target_function(new_solution)
     if (new_fitness < position[random_bird, -1]):
         position[random_bird,:-1] = new_solution
@@ -74,8 +78,22 @@ def update_positions(position, discovery_rate, min_values, max_values, target_fu
 
 # Function: CS
 def enhanced_cuckoo_search(birds = 3, discovery_rate = 0.25, alpha_value = 0.01, lambda_value = 1.5, min_values = [-5,-5], max_values = [5,5], iterations = 50, target_function = target_function, verbose = True, start_init = None, target_value = None, simulator = False, init_population = None): 
-    position = initial_variables(birds, min_values, max_values, target_function, start_init) if not simulator else init_population
-    
+    """
+    Enhanced Cuckoo Search algorithm using Sobol sequence initialization
+    """
+    if not simulator:
+        # Create instance of SobolInitialization
+        sobol_initializer = SobolInitialization()
+        # Use the sobol_initialization method
+        position = sobol_initializer.sobol_initialization(
+            size=birds,
+            min_values=min_values,
+            max_values=max_values,
+            target_function=target_function,
+            start_init=start_init
+        )
+    else:
+        position = init_population
     best_ind = np.copy(position[position[:,-1].argsort()][0,:])
     count    = 0
 
