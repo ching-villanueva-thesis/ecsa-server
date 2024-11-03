@@ -2,9 +2,6 @@ from src.ecs.algo import enhanced_cuckoo_search
 from functions.test import ackley, griewangk_8
 
 from src.util.standard_deviation import sdv
-from functions.test import ackley, griewangk_8
-
-from src.util.standard_deviation import sdv
 
 if __name__ == '__main__':
     CS_PARAMS = {
