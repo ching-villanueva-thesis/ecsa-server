@@ -1,6 +1,8 @@
 import numpy as np
 from scipy.special import gamma
 
+from .sop import SobolInitialization, CosineAnnealingWithWarmRestarts
+
 def target_function(sol):
     return np.random.rand()
 
@@ -67,6 +69,7 @@ def abandon_nest(nests, f_values, discovery_rate):
 
             new_nests[i] = (probability > np.random.rand(nests[i].shape[0])).astype(int)
 
+
             new_f_values[i] = target_function(new_nests[i])
 
     return new_nests, new_f_values
@@ -77,31 +80,45 @@ def discrete_cuckoo_search_algorithm(size = 3, discovery_rate = 0.25, alpha_valu
     best_ind = f_values.argsort()[0]
     count = 0
 
+    d_max, d_min = discovery_rate
+    d_cos_annealing = CosineAnnealingWithWarmRestarts(n_max=d_max, n_min=d_min, t_max=2)
+
+    a_max, a_min = alpha_value
+    a_cos_annealing = CosineAnnealingWithWarmRestarts(n_max=a_max, n_min=a_min, t_max=2)
+
     while(count <= iterations):
-      for _ in range(0, nests.shape[0]):
-          new_sol, old_sol = get_cuckoo(nests=nests, lambda_value=lambda_value, alpha_value=alpha_value)
+        # adaptive step size
+        a_val = a_cos_annealing.step()
 
-          new_fitness = target_function(new_sol)
-          print("Previous Sol\n", nests[old_sol])
-          print("New Sol\n", new_sol)
-          
-          if(new_fitness < f_values[old_sol]):
-               nests[old_sol] = new_sol
-               f_values[old_sol] = new_fitness
-          
-      n_nests, n_f_values = abandon_nest(nests=nests, f_values=f_values, discovery_rate=discovery_rate)
+        for _ in range(0, nests.shape[0]):
+            new_sol, old_sol = get_cuckoo(nests=nests, lambda_value=lambda_value, alpha_value=a_val)
 
-      nests = n_nests
-      f_values = n_f_values
+            new_fitness = target_function(new_sol)
+            print("Previous Sol\n", nests[old_sol])
+            print("New Sol\n", new_sol)
+            
+            if(new_fitness < f_values[old_sol]):
+                nests[old_sol] = new_sol
+                f_values[old_sol] = new_fitness
 
-      value_ind = f_values.argsort()[0]
+        # adaptive discovery rate
+        d_rate = d_cos_annealing.step()
+            
+        n_nests, n_f_values = abandon_nest(nests=nests, f_values=f_values, discovery_rate=d_rate)
 
-      if f_values[best_ind] > f_values[value_ind]:
-          best_ind = value_ind
+        nests = n_nests
+        f_values = n_f_values
 
-      count += 1
+        value_ind = f_values.argsort()[0]
+
+        if f_values[best_ind] > f_values[value_ind]:
+            best_ind = value_ind
+
+        count += 1
+        print("Alpha val: ", a_val)
+        print("Discovery rate: ", d_rate)
 
     best = nests[best_ind]
     return nests, f_values, best
 
-nests, f_values, best = discrete_cuckoo_search_algorithm(size=15, dimensions=(10, 5), iterations=10)
+nests, f_values, best = discrete_cuckoo_search_algorithm(size=15, dimensions=(10, 5), iterations=10, discovery_rate=(0.75, 0.25), alpha_value=(0.01, 0.05))
