@@ -1,11 +1,13 @@
-from src.cs.algo import cuckoo_search
+import matplotlib.pyplot as plt
+from src.cs.algo import cuckoo_search, initial_variables
 from functions.test import ackley, griewangk_8
 
+from src.util.plot_population import plot_population
 from src.util.standard_deviation import sdv
 
 if __name__ == '__main__':
     CS_PARAMS = {
-    'birds': 15,
+    'birds': 300,
     'iterations': 100,
     'discovery_rate': 0.25,
     'alpha_value': 0.01,
@@ -15,6 +17,21 @@ if __name__ == '__main__':
     'max_values': (32,32),
     'verbose': False
     }
+
+    # Generate and plot initial population
+    initial_pop = initial_variables(
+        size=CS_PARAMS['birds'],
+        min_values=CS_PARAMS['min_values'],
+        max_values=CS_PARAMS['max_values'],
+        target_function=ackley
+    )
+    
+    # Visualize initial population
+    plot_population(
+        initial_pop, 
+        CS_PARAMS['min_values'], 
+        CS_PARAMS['max_values']
+    )
 
     converged = 0
     total = 0
