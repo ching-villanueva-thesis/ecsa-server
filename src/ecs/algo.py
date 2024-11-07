@@ -105,6 +105,7 @@ def enhanced_cuckoo_search(birds = 3, discovery_rate = 0.25, alpha_value = 0.01,
 
     hasReachedTarget = False
     _iter = 0
+    fmin = []
 
     while (count <= iterations):
         if (verbose == True):
@@ -128,11 +129,13 @@ def enhanced_cuckoo_search(birds = 3, discovery_rate = 0.25, alpha_value = 0.01,
             if (best_ind[-1] <= target_value):
                 count = 2* iterations
                 hasReachedTarget = True
+                fmin.append(best_ind[-1])
             else:
                 count = count + 1
                 _iter = count
+                fmin.append(best_ind[-1])
         else:
             count = count + 1
-    return best_ind, hasReachedTarget, _iter
+    return best_ind, hasReachedTarget, _iter, fmin
 
 ############################################################################
