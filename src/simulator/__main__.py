@@ -1,23 +1,23 @@
 import numpy as np
-from .writer import writer
+from .writer import writer, fmin_writer
 
 from src.ecs.algo import enhanced_cuckoo_search
 from src.cs.algo import cuckoo_search
 from src.util.convergence_curve import show_convergence
-from src.util.standard_deviation import sdv
+from scipy.stats import wilcoxon
 
 from functions.unimodal import unimodal_fns
 
 if __name__ == '__main__':
     # D=15, n=50
-    f_no = 'F7'
+    f_no = 'F5'
 
     CS_PARAMS = {
     'birds': 50,
     'iterations': 500,
     'target_function': unimodal_fns[f_no],
-    'min_values': tuple([-1.28 for _ in range(15)]),
-    'max_values': tuple([1.28 for _ in range(15)]),
+    'min_values': tuple([-30 for _ in range(15)]),
+    'max_values': tuple([30 for _ in range(15)]),
     'lambda_value': 1.5,
     'target_value': 0,
     'verbose': False
@@ -57,6 +57,8 @@ if __name__ == '__main__':
     ecsa_best_mean = np.mean(_ecsa_best)
     ecsa_best_std = np.std(_ecsa_best)
 
+    w = wilcoxon(x=avg_csa_fmin, y=avg_ecsa_fmin)
+
     print("=============== Results ===============")
     print("Runs: 30")
     print("CSA Mean: ", csa_best_mean)
@@ -70,10 +72,16 @@ if __name__ == '__main__':
     writer(
         function=f_no,
         data=[
-        ["csa",csa_best_mean, csa_best_std],
-        ["ecsa",ecsa_best_mean, ecsa_best_std]
+        ["csa",csa_best_mean, csa_best_std, w.pvalue],
+        ["ecsa",ecsa_best_mean, ecsa_best_std],
         ]
         )
+    
+    fmin_writer(
+        function=f_no,
+        data=[avg_csa_fmin, avg_ecsa_fmin]
+    )
+
     show_convergence(
         function=f_no,
         csa_fmin=avg_csa_fmin, ecsa_fmin=avg_ecsa_fmin, csa_best=csa_best[-1], ecsa_best=ecsa_best[-1]
