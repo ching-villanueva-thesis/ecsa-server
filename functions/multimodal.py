@@ -1,11 +1,10 @@
 import numpy as np
 
-# F3
+# F6
 def ackley(n = [0,0]):
     n = np.array(n)
-    return -20 * np.exp(-0.2 * np.sqrt(1/len(n) * np.sum(n**2))) - np.exp(1/len(n) * np.sum(np.cos(2*np.pi*n))) + 20 + np.e
-
-# F4
+    return -20 * np.exp(-0.2 * np.sqrt(1/len(n) * np.sum(n**2))) - np.exp(1/len(n) * np.sum(np.cos(2*np.pi*n))) + 20 + np.exp(1)
+# F7
 def griewank(n = [0,0]):
     n = np.array(n)
     term1 = np.sum(n**2) / 4000
