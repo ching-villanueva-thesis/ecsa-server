@@ -11,7 +11,7 @@ def writer(data, function):
     cs, ecs = data
 
     _data = [
-        ['Algorithm', 'Mean', 'Standard Deviation'],
+        ['Algorithm','Mean', 'Standard Deviation'],
         cs,
         ecs,
     ]

@@ -98,10 +98,10 @@ def enhanced_cuckoo_search(birds = 3, discovery_rate = 0.25, alpha_value = 0.01,
     count    = 0
 
     d_max, d_min = discovery_rate
-    d_cos_annealing = CosineAnnealingWithWarmRestarts(n_max=d_max, n_min=d_min, t_max=20)
+    d_cos_annealing = CosineAnnealingWithWarmRestarts(n_max=d_max, n_min=d_min, t_max=iterations/4)
 
     a_max, a_min = alpha_value
-    a_cos_annealing = CosineAnnealingWithWarmRestarts(n_max=a_max, n_min=a_min, t_max=20)
+    a_cos_annealing = CosineAnnealingWithWarmRestarts(n_max=a_max, n_min=a_min, t_max=iterations/4)
 
     hasReachedTarget = False
     _iter = 0

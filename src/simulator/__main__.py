@@ -29,6 +29,11 @@ if __name__ == '__main__':
     _ecsa_fmin = None
     _ecsa_best = []
 
+    print(f"CSA vs ECSA in {runs} individual runs\n")
+    print("Parameters")
+    print("CSA: Discovery Rate = 0.25, Alpha Value = 0.01")
+    print("ECSA: Discovery Rate = [0.5,0.25], Alpha Value = [0.01,0.05]")
+
     print("=============== Cuckoo Search Algorithm ===============")
     for i in range(runs):
         csa_best, csa_hasReachedTarget, csa_iter, csa_fmin = cuckoo_search(discovery_rate=0.25, alpha_value=0.01, **CS_PARAMS)
@@ -38,7 +43,7 @@ if __name__ == '__main__':
     
     print("=============== Enhanced Cuckoo Search Algorithm ===============")
     for i in range(runs):
-        ecsa_best, ecsa_hasReachedTarget, ecsa_iter, ecsa_fmin = enhanced_cuckoo_search(discovery_rate=[0.75, 0.25], alpha_value=[0.01, 0.05], **CS_PARAMS)
+        ecsa_best, ecsa_hasReachedTarget, ecsa_iter, ecsa_fmin = enhanced_cuckoo_search(discovery_rate=[0.5, 0.25], alpha_value=[0.01, 0.05], **CS_PARAMS)
         _ecsa_fmin = ecsa_fmin if _ecsa_fmin is None else np.sum([_ecsa_fmin, ecsa_fmin], axis=0)
         print(f"Trial {i+1} Done.\nBest:\n", ecsa_best[-1])
         _ecsa_best.append(ecsa_best[-1])
@@ -56,7 +61,8 @@ if __name__ == '__main__':
     print("Runs: 30")
     print("CSA Mean: ", csa_best_mean)
     print("CSA Std: ", csa_best_std)
-    print("\nECSA Mean: ", ecsa_best_mean)
+
+    print("ECSA Mean: ", ecsa_best_mean)
     print("ECSA Std: ", ecsa_best_std)
 
     print("\nVisualizing Results...")
