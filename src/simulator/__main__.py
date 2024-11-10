@@ -7,17 +7,18 @@ from src.util.convergence_curve import show_convergence
 from scipy.stats import wilcoxon
 
 from functions.unimodal import unimodal_fns
+from functions.multimodal import multimodal_fns
 
 if __name__ == '__main__':
     # D=15, n=50
-    f_no = 'F5'
+    f_no = 'F8'
 
     CS_PARAMS = {
     'birds': 50,
-    'iterations': 500,
-    'target_function': unimodal_fns[f_no],
-    'min_values': tuple([-30 for _ in range(15)]),
-    'max_values': tuple([30 for _ in range(15)]),
+    'iterations': 50    ,
+    'target_function': multimodal_fns[f_no],
+    'min_values': tuple([-5.12 for _ in range(15)]),
+    'max_values': tuple([5.12 for _ in range(15)]),
     'lambda_value': 1.5,
     'target_value': 0,
     'verbose': False
@@ -36,14 +37,14 @@ if __name__ == '__main__':
 
     print("=============== Cuckoo Search Algorithm ===============")
     for i in range(runs):
-        csa_best, csa_hasReachedTarget, csa_iter, csa_fmin = cuckoo_search(discovery_rate=0.25, alpha_value=0.01, **CS_PARAMS)
+        csa_best, csa_hasReachedTarget, csa_iter, csa_fmin = cuckoo_search(discovery_rate=0.25, alpha_value=0.01,**CS_PARAMS)
         _csa_fmin = csa_fmin if _csa_fmin is None else np.sum([_csa_fmin, csa_fmin], axis=0)
         print(f"Trial {i+1} Done.\nBest:\n", csa_best[-1])
         _csa_best.append(csa_best[-1])
     
     print("=============== Enhanced Cuckoo Search Algorithm ===============")
     for i in range(runs):
-        ecsa_best, ecsa_hasReachedTarget, ecsa_iter, ecsa_fmin = enhanced_cuckoo_search(discovery_rate=[0.5, 0.25], alpha_value=[0.01, 0.05], **CS_PARAMS)
+        ecsa_best, ecsa_hasReachedTarget, ecsa_iter, ecsa_fmin = enhanced_cuckoo_search(discovery_rate=[0.5, 0.25], alpha_value=[0.01, 0.05],**CS_PARAMS)
         _ecsa_fmin = ecsa_fmin if _ecsa_fmin is None else np.sum([_ecsa_fmin, ecsa_fmin], axis=0)
         print(f"Trial {i+1} Done.\nBest:\n", ecsa_best[-1])
         _ecsa_best.append(ecsa_best[-1])
@@ -57,7 +58,7 @@ if __name__ == '__main__':
     ecsa_best_mean = np.mean(_ecsa_best)
     ecsa_best_std = np.std(_ecsa_best)
 
-    w = wilcoxon(x=avg_csa_fmin, y=avg_ecsa_fmin)
+    w = wilcoxon(x=_csa_best, y=_ecsa_best)
 
     print("=============== Results ===============")
     print("Runs: 30")
@@ -69,21 +70,20 @@ if __name__ == '__main__':
 
     print("\nVisualizing Results...")
 
-    writer(
-        function=f_no,
-        data=[
-        ["csa",csa_best_mean, csa_best_std, w.pvalue],
-        ["ecsa",ecsa_best_mean, ecsa_best_std],
-        ]
-        )
+    # writer(
+    #     function=f_no,
+    #     data=[
+    #     ["csa",csa_best_mean, csa_best_std, w.pvalue],
+    #     ["ecsa",ecsa_best_mean, ecsa_best_std],
+    #     ]
+    #     )
     
-    fmin_writer(
-        function=f_no,
-        data=[avg_csa_fmin, avg_ecsa_fmin]
-    )
+    # fmin_writer(
+    #     function=f_no,
+    #     data=[_csa_best, _ecsa_best]
+    # )
 
     show_convergence(
         function=f_no,
         csa_fmin=avg_csa_fmin, ecsa_fmin=avg_ecsa_fmin, csa_best=csa_best[-1], ecsa_best=ecsa_best[-1]
         )
-    

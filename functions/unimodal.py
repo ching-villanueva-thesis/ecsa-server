@@ -1,7 +1,7 @@
 import numpy as np
 
 def F1(x):
-    """Sum of squares function
+    """Sphere function
     Dimensions: 15
     Range: [-100, 100]
     Optimum: 0
@@ -9,7 +9,7 @@ def F1(x):
     return np.sum(x**2)
 
 def F2(x):
-    """Combined sum and product of absolute values
+    """Schwefel's 2. function
     Dimensions: 15
     Range: [-10, 10]
     Optimum: 0
@@ -17,7 +17,7 @@ def F2(x):
     return np.sum(np.abs(x)) + np.prod(np.abs(x))
 
 def F3(x):
-    """Square of sum function
+    """Schwefel's 1.20 function
     Dimensions: 15
     Range: [-100, 100]
     Optimum: 0
@@ -30,7 +30,7 @@ def F3(x):
     return result
 
 def F4(x):
-    """Maximum absolute value
+    """Schwefel's 2.21 function
     Dimensions: 15
     Range: [-100, 100]
     Optimum: 0
@@ -56,7 +56,7 @@ def F6(x):
     return np.sum((x + 0.5)**2)
 
 def F7(x):
-    """Noisy quartic function
+    """Quartic Noise function
     Dimensions: 15
     Range: [-1.28, 1.28]
     Optimum: 0
