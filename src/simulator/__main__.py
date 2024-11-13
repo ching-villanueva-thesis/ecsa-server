@@ -1,59 +1,90 @@
+import numpy as np
+from .writer import writer, fmin_writer
+
 from src.ecs.algo import enhanced_cuckoo_search
 from src.cs.algo import cuckoo_search
-from functions.test import ackley, griewangk_8
-from scipy.stats import ranksums
+from src.util.convergence_curve import show_convergence
+from scipy.stats import wilcoxon
 
-from src.util.standard_deviation import sdv
-from src.simulator.population import initial_variables
-from src.simulator.writer import writer
+from functions.unimodal import unimodal_fns
+from functions.multimodal import multimodal_fns
 
 if __name__ == '__main__':
+    # D=15, n=50
+    f_no = 'F11'
+
     CS_PARAMS = {
-    'birds': 15,
+    'birds': 50,
     'iterations': 100,
+    'target_function': multimodal_fns[f_no],
+    'min_values': tuple([-500 for _ in range(15)]),
+    'max_values': tuple([500 for _ in range(15)]),
     'lambda_value': 1.5,
-    'target_value': 0,
-    'min_values': (-32,-32),
-    'max_values': (32,32),
+    'target_value': -418.9829 * 15,
+    # 'target_value': 0,
     'verbose': False
-    # discovery_rate
     }
 
     runs = 30
-    cs_converged = 0
-    ecs_converged = 0
-    cs_fitness = []
-    ecs_fitness = []
+    _csa_fmin = None
+    _csa_best = []
+    _ecsa_fmin = None
+    _ecsa_best = []
 
-    data = []
+    print(f"CSA vs ECSA in {runs} individual runs\n")
+    print("Parameters")
+    print("CSA: Discovery Rate = 0.25, Alpha Value = 0.01")
+    print("ECSA: Discovery Rate = [0.5,0.25], Alpha Value = [0.01,0.05]")
 
-    print(f"Running CS vs ECS Simulator {runs} times")
+    print("=============== Cuckoo Search Algorithm ===============")
     for i in range(runs):
-        print(f"====== Trial {i + 1} ======")
-
-        # init_population = initial_variables(size=CS_PARAMS['birds'], min_values=CS_PARAMS['min_values'], max_values=CS_PARAMS['max_values'], target_function=ackley, start_init=None)
-
-        cs_best, cs_hasReachedTarget, cs_iter = cuckoo_search(target_function=ackley, discovery_rate=0.25, alpha_value=0.01, **CS_PARAMS)
-
-        ecs_best, ecs_hasReachedTarget, ecs_iter = enhanced_cuckoo_search(target_function=ackley, discovery_rate=[0.5, 0.25], alpha_value=[0.01, 0.05], **CS_PARAMS)
-
-        cs_fitness.append(cs_best[-1])
-        ecs_fitness.append(ecs_best[-1])
-
-        if cs_hasReachedTarget:
-            cs_converged += 1
-        
-        if ecs_hasReachedTarget:
-            ecs_converged += 1
-
-    print(f"CS has converged {cs_converged} times.")
-    print(f"ECS has converged {ecs_converged} times.")
-
-    data.append(['Cuckoo Search', min(cs_fitness), max(cs_fitness), sum(cs_fitness) / len(cs_fitness), sdv(cs_fitness)])
-    data.append(['Enhanced Cuckoo Search', min(ecs_fitness), max(ecs_fitness), sum(ecs_fitness) / len(ecs_fitness), sdv(ecs_fitness)])
-
-    file_path = writer(data=data)
-    print(f"Results has been saved in {file_path}")
-
+        csa_best, csa_hasReachedTarget, csa_iter, csa_fmin = cuckoo_search(discovery_rate=0.25, alpha_value=0.01,**CS_PARAMS)
+        _csa_fmin = csa_fmin if _csa_fmin is None else np.sum([_csa_fmin, csa_fmin], axis=0)
+        print(f"Trial {i+1} Done.\nBest:\n", csa_best[-1])
+        _csa_best.append(csa_best[-1])
     
+    print("=============== Enhanced Cuckoo Search Algorithm ===============")
+    for i in range(runs):
+        ecsa_best, ecsa_hasReachedTarget, ecsa_iter, ecsa_fmin = enhanced_cuckoo_search(discovery_rate=[0.5, 0.25], alpha_value=[0.01, 0.05],**CS_PARAMS)
+        _ecsa_fmin = ecsa_fmin if _ecsa_fmin is None else np.sum([_ecsa_fmin, ecsa_fmin], axis=0)
+        print(f"Trial {i+1} Done.\nBest:\n", ecsa_best[-1])
+        _ecsa_best.append(ecsa_best[-1])
 
+    avg_csa_fmin = np.divide(_csa_fmin, runs)
+    avg_ecsa_fmin = np.divide(_ecsa_fmin, runs)
+
+    csa_best_mean = np.mean(_csa_best) 
+    csa_best_std = np.std(_csa_best)
+
+    ecsa_best_mean = np.mean(_ecsa_best)
+    ecsa_best_std = np.std(_ecsa_best)
+
+    w = wilcoxon(x=_csa_best, y=_ecsa_best)
+
+    print("=============== Results ===============")
+    print("Runs: 30")
+    print("CSA Mean: ", csa_best_mean)
+    print("CSA Std: ", csa_best_std)
+
+    print("ECSA Mean: ", ecsa_best_mean)
+    print("ECSA Std: ", ecsa_best_std)
+
+    print("\nVisualizing Results...")
+
+    writer(
+        function=f_no,
+        data=[
+        ["csa",csa_best_mean, csa_best_std, w.pvalue],
+        ["ecsa",ecsa_best_mean, ecsa_best_std],
+        ]
+        )
+    
+    fmin_writer(
+        function=f_no,
+        data=[_csa_best, _ecsa_best]
+    )
+
+    show_convergence(
+        function=f_no,
+        csa_fmin=avg_csa_fmin, ecsa_fmin=avg_ecsa_fmin, csa_best=csa_best[-1], ecsa_best=ecsa_best[-1]
+        )
