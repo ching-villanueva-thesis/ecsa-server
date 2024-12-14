@@ -1,6 +1,9 @@
 import numpy as np
 from scipy.special import gamma
 
+from src.dataset import getDataFromDataset
+from functions.distance import Distance
+
 def target_function(sol):
     return np.random.rand()
 
@@ -82,8 +85,6 @@ def discrete_cuckoo_search_algorithm(size = 3, discovery_rate = 0.25, alpha_valu
           new_sol, old_sol = get_cuckoo(nests=nests, lambda_value=lambda_value, alpha_value=alpha_value)
 
           new_fitness = target_function(new_sol)
-          print("Previous Sol\n", nests[old_sol])
-          print("New Sol\n", new_sol)
           
           if(new_fitness < f_values[old_sol]):
                nests[old_sol] = new_sol
@@ -94,6 +95,7 @@ def discrete_cuckoo_search_algorithm(size = 3, discovery_rate = 0.25, alpha_valu
       nests = n_nests
       f_values = n_f_values
 
+      print(f_values)
       value_ind = f_values.argsort()[0]
 
       if f_values[best_ind] > f_values[value_ind]:
@@ -104,4 +106,9 @@ def discrete_cuckoo_search_algorithm(size = 3, discovery_rate = 0.25, alpha_valu
     best = nests[best_ind]
     return nests, f_values, best
 
-nests, f_values, best = discrete_cuckoo_search_algorithm(size=15, dimensions=(10, 5), iterations=10)
+db_coordinates, es_coordinates = getDataFromDataset()
+
+d = Distance(db_coordinates=db_coordinates, es_coordinates=es_coordinates)
+
+nests, f_values, best = discrete_cuckoo_search_algorithm(size=15, dimensions=(len(db_coordinates), len(es_coordinates)), iterations=500, target_function=d.fitness)
+print(best)

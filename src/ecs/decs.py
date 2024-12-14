@@ -104,6 +104,9 @@ def discrete_cuckoo_search_algorithm(size = 3, discovery_rate = 0.25, alpha_valu
         # adaptive discovery rate
         d_rate = d_cos_annealing.step()
             
+        print("Alpha val: ", a_val)
+        print("Discovery rate: ", d_rate)
+        
         n_nests, n_f_values = abandon_nest(nests=nests, f_values=f_values, discovery_rate=d_rate)
 
         nests = n_nests
@@ -115,8 +118,6 @@ def discrete_cuckoo_search_algorithm(size = 3, discovery_rate = 0.25, alpha_valu
             best_ind = value_ind
 
         count += 1
-        print("Alpha val: ", a_val)
-        print("Discovery rate: ", d_rate)
 
     best = nests[best_ind]
     return nests, f_values, best
