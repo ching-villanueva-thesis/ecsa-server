@@ -86,5 +86,5 @@ if __name__ == '__main__':
 
     show_convergence(
         function=f_no,
-        csa_fmin=avg_csa_fmin, ecsa_fmin=avg_ecsa_fmin, csa_best=csa_best[-1], ecsa_best=ecsa_best[-1]
+        csa_fmin=avg_csa_fmin, ecsa_fmin=avg_ecsa_fmin
         )

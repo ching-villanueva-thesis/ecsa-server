@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def show_convergence(csa_fmin, ecsa_fmin, csa_best, ecsa_best, function):
+def show_convergence(csa_fmin, ecsa_fmin, function):
     # Create the figure and axis
     plt.figure(figsize=(12, 7))
 

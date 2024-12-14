@@ -1,7 +1,11 @@
 import numpy as np
 from scipy.special import gamma
+from scipy.stats.qmc import Sobol
 
 from .sop import SobolInitialization, CosineAnnealingWithWarmRestarts
+
+from src.dataset import getDataFromDataset
+from functions.distance import Distance
 
 def target_function(sol):
     return np.random.rand()
@@ -9,16 +13,19 @@ def target_function(sol):
 def sigmoid(new_solution):
     return 1 / (1 + np.exp(-new_solution))
 
-def initialize_nests(size, dimensions):
+def initialize_nests(size, dimensions, target_function):
     # building/barangay (bb), evacuation space (es)
     bb, es = dimensions
+    dim = bb * es
 
-    # Generate a vector with values uniformly distributed between 0 and 1
-    uniform_samples = np.random.uniform(0, 1, (size, bb * es))
+    # Generate Sobol sequence samples
+    sobol_sampler = Sobol(d=dim, scramble=True)  # Scramble adds randomness while maintaining low discrepancy
+    sobol_samples = sobol_sampler.random(n=size)
 
     # Convert to binary: 1 if the value is >= 0.5, else 0
-    binary_vector = (uniform_samples >= 0.5).astype(int)
-    fitness_values = np.random.rand(size)
+    binary_vector = (sobol_samples >= 0.5).astype(int)
+
+    fitness_values = np.array([target_function(solution) for solution in binary_vector])
 
     return binary_vector, fitness_values
 
@@ -75,17 +82,18 @@ def abandon_nest(nests, f_values, discovery_rate):
     return new_nests, new_f_values
 
 
-def discrete_cuckoo_search_algorithm(size = 3, discovery_rate = 0.25, alpha_value = 0.01, lambda_value = 1.5, dimensions = (5,5), iterations = 50, target_function = target_function):
-    nests, f_values = initialize_nests(size, dimensions)
+def discrete_enhanced_cuckoo_search_algorithm(size = 3, discovery_rate = 0.25, alpha_value = 0.01, lambda_value = 1.5, dimensions = (5,5), iterations = 50, target_function = target_function):
+    nests, f_values = initialize_nests(size, dimensions, target_function)
     best_ind = f_values.argsort()[0]
     count = 0
 
     d_max, d_min = discovery_rate
-    d_cos_annealing = CosineAnnealingWithWarmRestarts(n_max=d_max, n_min=d_min, t_max=2)
+    d_cos_annealing = CosineAnnealingWithWarmRestarts(n_max=d_max, n_min=d_min, t_max=iterations/5)
 
     a_max, a_min = alpha_value
-    a_cos_annealing = CosineAnnealingWithWarmRestarts(n_max=a_max, n_min=a_min, t_max=2)
+    a_cos_annealing = CosineAnnealingWithWarmRestarts(n_max=a_max, n_min=a_min, t_max=iterations/5)
 
+    fmin = []
     while(count <= iterations):
         # adaptive step size
         a_val = a_cos_annealing.step()
@@ -94,8 +102,6 @@ def discrete_cuckoo_search_algorithm(size = 3, discovery_rate = 0.25, alpha_valu
             new_sol, old_sol = get_cuckoo(nests=nests, lambda_value=lambda_value, alpha_value=a_val)
 
             new_fitness = target_function(new_sol)
-            print("Previous Sol\n", nests[old_sol])
-            print("New Sol\n", new_sol)
             
             if(new_fitness < f_values[old_sol]):
                 nests[old_sol] = new_sol
@@ -104,8 +110,8 @@ def discrete_cuckoo_search_algorithm(size = 3, discovery_rate = 0.25, alpha_valu
         # adaptive discovery rate
         d_rate = d_cos_annealing.step()
             
-        print("Alpha val: ", a_val)
-        print("Discovery rate: ", d_rate)
+        # print("Alpha val: ", a_val)
+        # print("Discovery rate: ", d_rate)
         
         n_nests, n_f_values = abandon_nest(nests=nests, f_values=f_values, discovery_rate=d_rate)
 
@@ -117,9 +123,18 @@ def discrete_cuckoo_search_algorithm(size = 3, discovery_rate = 0.25, alpha_valu
         if f_values[best_ind] > f_values[value_ind]:
             best_ind = value_ind
 
+        fmin.append(f_values[f_values.argsort()[0]])
         count += 1
 
     best = nests[best_ind]
-    return nests, f_values, best
+    best_fev = f_values[f_values.argsort()[0]]
+    return nests, f_values, fmin, best, best_fev
 
-nests, f_values, best = discrete_cuckoo_search_algorithm(size=15, dimensions=(10, 5), iterations=10, discovery_rate=(0.75, 0.25), alpha_value=(0.01, 0.05))
+# db_coordinates, es_coordinates = getDataFromDataset()
+
+# d = Distance(db_coordinates=db_coordinates, es_coordinates=es_coordinates)
+
+# nests, f_values, best, best_fev = discrete_enhanced_cuckoo_search_algorithm(size=50, dimensions=(len(db_coordinates), len(es_coordinates)), iterations=500, discovery_rate=(0.75, 0.25), alpha_value=(0.01, 0.05), target_function=d.fitness)
+
+# print(best)
+# print(best_fev)

@@ -10,7 +10,7 @@ def target_function(sol):
 def sigmoid(new_solution):
     return 1 / (1 + np.exp(-new_solution))
 
-def initialize_nests(size, dimensions):
+def initialize_nests(size, dimensions, target_function):
     # building/barangay (bb), evacuation space (es)
     bb, es = dimensions
 
@@ -19,7 +19,7 @@ def initialize_nests(size, dimensions):
 
     # Convert to binary: 1 if the value is >= 0.5, else 0
     binary_vector = (uniform_samples >= 0.5).astype(int)
-    fitness_values = np.random.rand(size)
+    fitness_values = np.array([target_function(solution) for solution in binary_vector])
 
     return binary_vector, fitness_values
 
@@ -76,10 +76,10 @@ def abandon_nest(nests, f_values, discovery_rate):
 
 
 def discrete_cuckoo_search_algorithm(size = 3, discovery_rate = 0.25, alpha_value = 0.01, lambda_value = 1.5, dimensions = (5,5), iterations = 50, target_function = target_function):
-    nests, f_values = initialize_nests(size, dimensions)
+    nests, f_values = initialize_nests(size, dimensions, target_function)
     best_ind = f_values.argsort()[0]
     count = 0
-
+    fmin = []
     while(count <= iterations):
       for _ in range(0, nests.shape[0]):
           new_sol, old_sol = get_cuckoo(nests=nests, lambda_value=lambda_value, alpha_value=alpha_value)
@@ -95,20 +95,23 @@ def discrete_cuckoo_search_algorithm(size = 3, discovery_rate = 0.25, alpha_valu
       nests = n_nests
       f_values = n_f_values
 
-      print(f_values)
       value_ind = f_values.argsort()[0]
 
       if f_values[best_ind] > f_values[value_ind]:
           best_ind = value_ind
 
+      fmin.append(f_values[f_values.argsort()[0]])
       count += 1
 
     best = nests[best_ind]
-    return nests, f_values, best
+    best_fev = f_values[f_values.argsort()[0]]
+    return nests, f_values, fmin, best, best_fev
 
-db_coordinates, es_coordinates = getDataFromDataset()
+# db_coordinates, es_coordinates = getDataFromDataset()
 
-d = Distance(db_coordinates=db_coordinates, es_coordinates=es_coordinates)
+# d = Distance(db_coordinates=db_coordinates, es_coordinates=es_coordinates)
 
-nests, f_values, best = discrete_cuckoo_search_algorithm(size=15, dimensions=(len(db_coordinates), len(es_coordinates)), iterations=500, target_function=d.fitness)
-print(best)
+# nests, f_values, best, best_fev = discrete_cuckoo_search_algorithm(size=50, dimensions=(len(db_coordinates), len(es_coordinates)), iterations=500, target_function=d.fitness)
+
+# print(best)
+# print(best_fev)

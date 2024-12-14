@@ -13,14 +13,10 @@ class Distance:
         return self._distance_matrix
     
     def fitness(self, solution):
-        f = 0
-        offset = 0
-
-        for i in range(len(self.db_coordinates)):
-            for j in range(len(self.es_coordinates)):
-                if(solution[offset + j]):
-                    f += self._distance_matrix[i][j]
-
-            offset += len(self.es_coordinates)
-
+         # Reshape the solution into a 2D array matching the shape of the distance matrix
+        solution_matrix = np.array(solution).reshape(len(self.db_coordinates), len(self.es_coordinates))
+    
+        # Element-wise multiply the solution matrix with the distance matrix and sum the results
+        f = np.sum(self._distance_matrix * solution_matrix)
+    
         return f
