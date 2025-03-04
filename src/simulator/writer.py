@@ -36,3 +36,16 @@ def fmin_writer(data, function):
         writer.writerows(_data)
 
     return file_path
+
+def solution_writer(algo, content):
+    current_time = datetime.now().strftime('%Y%m%d_%H%M%S')
+    file_name = f'{current_time}_{algo} solutions.txt'
+    file_path =  pathlib.Path(__file__).cwd() / 'src' / 'simulator' /'results' / file_name
+
+    try:
+        with open(file_path, 'w') as file:
+            for row in content:
+                file.write("\t".join(map(str, row)) + "\n")
+        print(f"File created successfully.")
+    except Exception as e:
+        print(f"An error occurred while writing to the file: {e}")
