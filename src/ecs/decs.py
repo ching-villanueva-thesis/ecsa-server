@@ -141,13 +141,13 @@ def discrete_enhanced_cuckoo_search_algorithm(size = 3, discovery_rate = 0.25, a
     best_fev = f_values[f_values.argsort()[0]]
     return nests, f_values, fmin, best, best_fev
 
-db_coordinates, es_coordinates = getDataFromDataset()
+# db_coordinates, es_coordinates = getDataFromDataset()
 
-d = Distance(db_coordinates=db_coordinates, es_coordinates=es_coordinates)
+# d = Distance(db_coordinates=db_coordinates, es_coordinates=es_coordinates)
 
-nests, f_values, fmin, best, best_fev = discrete_enhanced_cuckoo_search_algorithm(size=50, dimensions=(len(db_coordinates), len(es_coordinates)), iterations=100, discovery_rate=(0.5, 0.25), alpha_value=(0.01, 0.05), target_function=d.fitness)
+# nests, f_values, fmin, best, best_fev = discrete_enhanced_cuckoo_search_algorithm(size=50, dimensions=(len(db_coordinates), len(es_coordinates)), iterations=100, discovery_rate=(0.5, 0.25), alpha_value=(0.01, 0.05), target_function=d.fitness)
 
-print("Decoding results...")
-decoded_result = d.decode_results(best)
-print(decoded_result)
-print("Done. Decoded Result Length: ", len(decoded_result))
+# print("Decoding results...")
+# decoded_result = d.decode_results(best)
+# print(decoded_result)
+# print("Done. Decoded Result Length: ", len(decoded_result))
