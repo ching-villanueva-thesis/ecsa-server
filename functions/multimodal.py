@@ -35,7 +35,12 @@ def F10(x):
     return sum_term - prod_term + 1
 
 def F11(x):
-    return np.sum(x * np.sin(np.sqrt(np.abs(x))))
+    """
+    Dimensions: 15
+    Range: [-500, 500]
+    Optimum: −2094.9145
+    """
+    return np.sum(-x * np.sin(np.sqrt(np.abs(x))))
 
 def F12(x, a=10, k=100, m=4):
     D = len(x)

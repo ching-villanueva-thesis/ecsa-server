@@ -111,7 +111,7 @@ def discrete_cuckoo_search_algorithm(size = 3, discovery_rate = 0.25, alpha_valu
 
 # d = Distance(db_coordinates=db_coordinates, es_coordinates=es_coordinates)
 
-# nests, f_values, best, best_fev = discrete_cuckoo_search_algorithm(size=50, dimensions=(len(db_coordinates), len(es_coordinates)), iterations=500, target_function=d.fitness)
+# nests, f_values, fmin, best, best_fev = discrete_cuckoo_search_algorithm(size=50, dimensions=(len(db_coordinates), len(es_coordinates)), iterations=500, target_function=d.fitness)
 
 # print(best)
 # print(best_fev)

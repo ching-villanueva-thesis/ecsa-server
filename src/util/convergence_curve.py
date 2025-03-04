@@ -14,10 +14,10 @@ def show_convergence(csa_fmin, ecsa_fmin, function):
 
     # Customize the plot
     plt.grid(True, linestyle='--', alpha=0.7)
-    plt.xlabel('Iterations', fontsize=12)
-    plt.ylabel('Values of fmin', fontsize=12)
-    plt.title(f"{function} Convergence Graph", fontsize=14)
-    plt.legend(fontsize=10)
+    # plt.xlabel('Iterations', fontsize=12)
+    # plt.ylabel('FEVs', fontsize=12)
+    # plt.title(f"{function} Convergence Graph", fontsize=14)
+    # plt.legend(fontsize=10)
 
     # Set the y-axis to a base 10 log scale
     ax = plt.gca()
@@ -29,5 +29,6 @@ def show_convergence(csa_fmin, ecsa_fmin, function):
     # Adjust layout
     plt.tight_layout()
 
+    plt.savefig('viz.png', format='png', dpi=600, transparent=True)
     # Show the plot
     plt.show()

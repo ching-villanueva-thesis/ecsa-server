@@ -1,6 +1,7 @@
 import numpy  as np
 from src.ecs.sop import CosineAnnealingWithWarmRestarts
 from src.ecs.sop import SobolInitialization
+from src.ecs.sop import gaussian_random_walk
 
 ############################################################################
 
@@ -41,14 +42,23 @@ def levy_flight(mean):
     return x1 * x2
 
 # Function: Replace Bird
-def replace_bird(position, alpha_value, lambda_value, min_values, max_values, target_function):
+def replace_bird(position, alpha_value, lambda_value, min_values, max_values, target_function, walk_type, best_solution, t):
     random_bird  = np.random.randint(position.shape[0])
-    levy_values  = levy_flight(lambda_value)
-    random_bird  = np.random.randint(position.shape[0])
-    levy_values  = levy_flight(lambda_value)
+
     new_solution = np.copy(position[random_bird, :-1])
     rand_factors = np.random.rand(len(min_values))
-    new_solution = np.clip(new_solution + alpha_value * levy_values * new_solution * rand_factors, min_values, max_values)
+
+    """
+        Hybrid
+        walk_type 0: Levy
+        walky_type 1: Gaussian
+    """
+    if walk_type == 0:
+        levy_values = levy_flight(lambda_value)
+        new_solution = np.clip(new_solution + alpha_value * levy_values * new_solution * rand_factors, min_values, max_values)
+    if walk_type == 1:
+        new_solution = gaussian_random_walk(best_solution=best_solution, current_solution=new_solution, t=t, upper_bound=max_values, lower_bound=min_values)
+
     new_fitness  = target_function(new_solution)
     new_fitness  = target_function(new_solution)
     if (new_fitness < position[random_bird, -1]):
@@ -94,14 +104,15 @@ def enhanced_cuckoo_search(birds = 3, discovery_rate = 0.25, alpha_value = 0.01,
         )
     else:
         position = init_population
+
     best_ind = np.copy(position[position[:,-1].argsort()][0,:])
     count    = 0
 
     d_max, d_min = discovery_rate
-    d_cos_annealing = CosineAnnealingWithWarmRestarts(n_max=d_max, n_min=d_min, t_max=iterations/4)
+    d_cos_annealing = CosineAnnealingWithWarmRestarts(n_max=d_max, n_min=d_min, t_max=iterations, c_max=4)
 
     a_max, a_min = alpha_value
-    a_cos_annealing = CosineAnnealingWithWarmRestarts(n_max=a_max, n_min=a_min, t_max=iterations/4)
+    a_cos_annealing = CosineAnnealingWithWarmRestarts(n_max=a_max, n_min=a_min, t_max=iterations, c_max=4)
     
     hasReachedTarget = False
     _iter = 0
@@ -109,15 +120,16 @@ def enhanced_cuckoo_search(birds = 3, discovery_rate = 0.25, alpha_value = 0.01,
 
     while (count <= iterations):
         if (verbose == True):
-            print('Iteration = ', count, ' f(x) = ', best_ind[-1])    
+            print('Iteration = ', count, ' f(x) = ', best_ind[-1])   
 
-        a_val = a_cos_annealing.step()
+        # adaptive alpha value
+        a_val = a_cos_annealing.step() if a_cos_annealing.walk_type == 0 else a_cos_annealing.n_min
         
         for i in range(0, position.shape[0]):
-            position = replace_bird(position=position, alpha_value=a_val, lambda_value=lambda_value, min_values=min_values, max_values=max_values, target_function=target_function)
+            position = replace_bird(position=position, alpha_value=a_val, lambda_value=lambda_value, min_values=min_values, max_values=max_values, target_function=target_function, walk_type=d_cos_annealing.walk_type, best_solution=best_ind[:-1], t=count)
 
         # adaptive discovery rate
-        d_rate = d_cos_annealing.step()
+        d_rate = d_cos_annealing.step() if d_cos_annealing.walk_type == 0 else d_cos_annealing.n_min
 
         position = update_positions(position=position, min_values=min_values, max_values=max_values, target_function=target_function, discovery_rate=d_rate)
         value    = np.copy(position[position[:,-1].argsort()][0,:])
@@ -136,6 +148,8 @@ def enhanced_cuckoo_search(birds = 3, discovery_rate = 0.25, alpha_value = 0.01,
                 fmin.append(best_ind[-1])
         else:
             count = count + 1
+            _iter = count
+            fmin.append(best_ind[-1])
     return best_ind, hasReachedTarget, _iter, fmin
 
 ############################################################################

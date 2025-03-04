@@ -25,7 +25,7 @@ d = Distance(db_coordinates=db_coordinates, es_coordinates=es_coordinates)
 
 print("=============== Discrete Cuckoo Search Algorithm ===============")
 for i in range(runs):
-    nests, f_values, fmin, best, best_fev = discrete_cuckoo_search_algorithm(size=50, dimensions=(len(db_coordinates), len(es_coordinates)), iterations=500, target_function=d.fitness)
+    nests, f_values, fmin, best, best_fev = discrete_cuckoo_search_algorithm(size=50, dimensions=(len(db_coordinates), len(es_coordinates)), iterations=100, target_function=d.fitness)
 
     print(f"Trial {i+1} Done.\nBest:\n", best_fev)
 
@@ -35,7 +35,7 @@ for i in range(runs):
     
 print("=============== Discrete Enhanced Cuckoo Search Algorithm ===============")
 for i in range(runs):
-    nests, f_values, fmin, best, best_fev = discrete_enhanced_cuckoo_search_algorithm(size=50, dimensions=(len(db_coordinates), len(es_coordinates)), iterations=500, discovery_rate=(0.5, 0.25), alpha_value=(0.01, 0.05), target_function=d.fitness)
+    nests, f_values, fmin, best, best_fev = discrete_enhanced_cuckoo_search_algorithm(size=50, dimensions=(len(db_coordinates), len(es_coordinates)), iterations=100, discovery_rate=(0.5, 0.25), alpha_value=(0.01, 0.05), target_function=d.fitness)
 
     print(f"Trial {i+1} Done.\nBest:\n", best_fev)
 
