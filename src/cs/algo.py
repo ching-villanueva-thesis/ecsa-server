@@ -79,6 +79,7 @@ def cuckoo_search(birds = 3, discovery_rate = 0.25, alpha_value = 0.01, lambda_v
     hasReachedTarget = False
     _iter = 0
     fmin = []
+
     while (count <= iterations):
         if (verbose == True):
             print('Iteration = ', count, ' f(x) = ', best_ind[-1])    
@@ -99,6 +100,8 @@ def cuckoo_search(birds = 3, discovery_rate = 0.25, alpha_value = 0.01, lambda_v
                 fmin.append(best_ind[-1])
         else:
             count = count + 1   
+            _iter = count
+            fmin.append(best_ind[-1])
     return best_ind, hasReachedTarget, _iter, fmin
 
 ############################################################################

@@ -1,6 +1,7 @@
 from .sop1 import SobolInitialization
+from .sop2 import gaussian_random_walk
 from .sop3 import CosineAnnealingWithWarmRestarts
 
 SobolInitialization
-
+gaussian_random_walk
 CosineAnnealingWithWarmRestarts
