@@ -80,28 +80,28 @@ def cuckoo_search(birds = 3, discovery_rate = 0.25, alpha_value = 0.01, lambda_v
     _iter = 0
     fmin = []
 
-    while (count <= iterations):
-        if (verbose == True):
-            print('Iteration = ', count, ' f(x) = ', best_ind[-1])    
-        for i in range(0, position.shape[0]):
-            position = replace_bird(position, alpha_value, lambda_value, min_values, max_values, target_function)
-        position = update_positions(position, discovery_rate, min_values, max_values, target_function)
-        value    = np.copy(position[position[:,-1].argsort()][0,:]) 
-        if (best_ind[-1] > value[-1]):
-            best_ind = np.copy(position[position[:,-1].argsort()][0,:])     
-        if (target_value is not None):
-            if (best_ind[-1] <= target_value):
-                count = 2* iterations
-                hasReachedTarget = True
-                fmin.append(best_ind[-1])
-            else:
-                count = count + 1
-                _iter = count
-                fmin.append(best_ind[-1])
-        else:
-            count = count + 1   
-            _iter = count
-            fmin.append(best_ind[-1])
-    return best_ind, hasReachedTarget, _iter, fmin
+    # while (count <= iterations):
+    #     if (verbose == True):
+    #         print('Iteration = ', count, ' f(x) = ', best_ind[-1])    
+    #     for i in range(0, position.shape[0]):
+    #         position = replace_bird(position, alpha_value, lambda_value, min_values, max_values, target_function)
+    #     position = update_positions(position, discovery_rate, min_values, max_values, target_function)
+    #     value    = np.copy(position[position[:,-1].argsort()][0,:]) 
+    #     if (best_ind[-1] > value[-1]):
+    #         best_ind = np.copy(position[position[:,-1].argsort()][0,:])     
+    #     if (target_value is not None):
+    #         if (best_ind[-1] <= target_value):
+    #             count = 2* iterations
+    #             hasReachedTarget = True
+    #             fmin.append(best_ind[-1])
+    #         else:
+    #             count = count + 1
+    #             _iter = count
+    #             fmin.append(best_ind[-1])
+    #     else:
+    #         count = count + 1   
+    #         _iter = count
+    #         fmin.append(best_ind[-1])
+    return best_ind, position, hasReachedTarget, _iter, fmin
 
 ############################################################################

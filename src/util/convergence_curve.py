@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import io
 
 def show_convergence(csa_fmin, ecsa_fmin, function):
     # Create the figure and axis
@@ -32,3 +33,34 @@ def show_convergence(csa_fmin, ecsa_fmin, function):
     plt.savefig('viz.png', format='png', dpi=600, transparent=True)
     # Show the plot
     plt.show()
+
+def plt_convergence(csa_fmin, ecsa_fmin, function):
+    fig, ax = plt.subplots(figsize=(12, 7))
+
+    csa_iterations = np.arange(len(csa_fmin))
+    ecsa_iterations = np.arange(len(ecsa_fmin))
+
+    # Plot both convergence curves
+    ax.plot(csa_iterations, csa_fmin, linewidth=2, label='Cuckoo Search Algorithm')
+    ax.plot(ecsa_iterations, ecsa_fmin, linewidth=2, label='Enhanced Cuckoo Search Algorithm')
+
+    # Customize the plot
+    ax.grid(True, linestyle='--', alpha=0.7)
+    ax.set_xlabel('Iterations', fontsize=12)
+    ax.set_ylabel('FEVs', fontsize=12)
+    ax.set_title(f"{function} Convergence Graph", fontsize=14)
+    ax.legend(fontsize=10)
+
+    # Set the y-axis to a base 10 log scale
+    ax.set_yscale('log')
+
+    # Add minor grid lines
+    ax.grid(True, which='minor', linestyle=':', alpha=0.4)
+
+    # Save to image bytes
+    img_bytes = io.BytesIO()
+    fig.savefig(img_bytes, format='png', dpi=600, transparent=True, bbox_inches='tight')
+    img_bytes.seek(0)
+
+    plt.close(fig)
+    return img_bytes
