@@ -8,17 +8,15 @@ def target_function(sol):
     return np.random.rand()
 
 def sigmoid(new_solution):
-    return 1 / (1 + np.exp(-new_solution))
+    return np.abs(np.tanh(new_solution))
 
 def initialize_nests(size, dimensions, target_function):
     # building/barangay (bb), evacuation space (es)
     bb, es = dimensions
 
     # Generate a vector with values uniformly distributed between 0 and 1
-    uniform_samples = np.random.uniform(0, 1, (size, bb * es))
+    binary_vector = np.random.randint(0, 2, (size, bb * es))
 
-    # Convert to binary: 1 if the value is >= 0.5, else 0
-    binary_vector = (uniform_samples >= 0.5).astype(int)
     fitness_values = np.array([target_function(solution) for solution in binary_vector])
 
     return binary_vector, fitness_values
@@ -106,12 +104,3 @@ def discrete_cuckoo_search_algorithm(size = 3, discovery_rate = 0.25, alpha_valu
     best = nests[best_ind]
     best_fev = f_values[f_values.argsort()[0]]
     return nests, f_values, fmin, best, best_fev
-
-# db_coordinates, es_coordinates = getDataFromDataset()
-
-# d = Distance(db_coordinates=db_coordinates, es_coordinates=es_coordinates)
-
-# nests, f_values, fmin, best, best_fev = discrete_cuckoo_search_algorithm(size=50, dimensions=(len(db_coordinates), len(es_coordinates)), iterations=500, target_function=d.fitness)
-
-# print(best)
-# print(best_fev)

@@ -23,10 +23,8 @@ class Distance:
         penalty = 0
         penalty_value = 1000  # Set an appropriate penalty value
 
-        for i in range(0, len(solution), len(self.es_coordinates) - 1): 
-            subarray = solution[i:i+len(self.es_coordinates) - 1]
-
-            if 1 not in subarray:  # If no 1s in the subarray, apply a penalty
+        for row in solution_matrix: 
+            if not np.any(row):
                 penalty += penalty_value
 
         return f + penalty  # Adding the penalty to the fitness function

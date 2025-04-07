@@ -1,6 +1,5 @@
 # Cosine Annealing w/ Warm Restarts
 import numpy as np
-import math
 
 class CosineAnnealingWithWarmRestarts:
     """
